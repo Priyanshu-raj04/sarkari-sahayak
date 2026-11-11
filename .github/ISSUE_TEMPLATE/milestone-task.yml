@@ -1,0 +1,23 @@
+name: Task
+description: A unit of work inside a milestone (one PR)
+labels: []
+body:
+  - type: textarea
+    id: goal
+    attributes: { label: Goal, description: "What and why, in 2–3 sentences." }
+    validations: { required: true }
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Testable statements. Each becomes at least one test.
+      value: |
+        - [ ]
+        - [ ]
+    validations: { required: true }
+  - type: textarea
+    id: tests
+    attributes: { label: Test plan, description: "Unit / integration / e2e tests to write first." }
+  - type: textarea
+    id: notes
+    attributes: { label: Notes / links }

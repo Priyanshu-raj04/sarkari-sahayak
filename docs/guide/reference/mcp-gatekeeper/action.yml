@@ -1,0 +1,59 @@
+name: "MCP Gatekeeper scan"
+description: "Scan MCP tool definitions for poisoning (incl. Hindi/Hinglish) and upload SARIF to code scanning"
+author: "Priyanshu Raj"
+branding:
+  icon: "shield"
+  color: "orange"
+inputs:
+  tools:
+    description: "Path to a saved tools/list JSON file"
+    required: true
+  fail-on:
+    description: "none | low | medium | high"
+    required: false
+    default: "high"
+  lockfile:
+    description: "Optional gatekeeper.lock.json to verify (rug-pull check)"
+    required: false
+    default: ""
+  version:
+    description: "mcp-tool-gatekeeper version from PyPI"
+    required: false
+    default: "1.0.0"
+outputs:
+  sarif:
+    description: "Path of the SARIF report"
+    value: ${{ steps.scan.outputs.sarif }}
+runs:
+  using: "composite"
+  steps:
+    - uses: astral-sh/setup-uv@v7
+    - id: scan
+      shell: bash
+      env:
+        TOOLS: ${{ inputs.tools }}
+        FAIL_ON: ${{ inputs.fail-on }}
+        GK_VERSION: ${{ inputs.version }}
+      run: |
+        sarif="$RUNNER_TEMP/gatekeeper.sarif"
+        echo "sarif=$sarif" >> "$GITHUB_OUTPUT"
+        set +e
+        uvx --from "mcp-tool-gatekeeper==${GK_VERSION}" gatekeeper scan \
+          --tools "$TOOLS" --format sarif --output "$sarif" --fail-on "$FAIL_ON"
+        echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+    - uses: github/codeql-action/upload-sarif@v4
+      if: always()
+      with:
+        sarif_file: ${{ steps.scan.outputs.sarif }}
+        category: mcp-gatekeeper
+    - if: inputs.lockfile != ''
+      shell: bash
+      env:
+        TOOLS: ${{ inputs.tools }}
+        LOCK: ${{ inputs.lockfile }}
+        GK_VERSION: ${{ inputs.version }}
+      run: uvx --from "mcp-tool-gatekeeper==${GK_VERSION}" gatekeeper verify --tools "$TOOLS" --lockfile "$LOCK"
+    - shell: bash
+      env:
+        CODE: ${{ steps.scan.outputs.exit_code }}
+      run: exit "$CODE"

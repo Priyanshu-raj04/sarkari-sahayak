@@ -1,0 +1,11 @@
+---
+description: TDD and testing conventions for this repo
+globs: ["src/**/*.py", "tests/**/*.py", "evals/**/*.py"]
+alwaysApply: true
+---
+- When asked to implement something, first propose/write the failing test(s) in tests/unit (or tests/integration
+  if it needs Postgres), show them, then implement.
+- Test names describe behaviour: test_<unit>_<does_what>_<when_condition>.
+- Use the fixtures in tests/conftest.py. Use FakeLLM (tests/fakes.py) for any LLM-dependent code.
+- Mark tests: @pytest.mark.integration (needs docker), @pytest.mark.e2e, @pytest.mark.llm (real model).
+- Keep coverage ≥ 80% overall and ≥ 90% for src/sahayak/retrieve and src/sahayak/agent.

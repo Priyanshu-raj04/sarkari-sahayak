@@ -1,0 +1,36 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  UV_FROZEN: "1"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      - run: uv python install 3.13
+      - run: uv sync --all-extras --group dev
+      - run: uv run ruff check . && uv run ruff format --check .
+      - run: uv run pyright
+      - name: Tests + coverage gates
+        run: |
+          uv run pytest -m "not llm" --cov --cov-report=term --cov-fail-under=80
+          uv run coverage report --include="src/gatekeeper/pii/*,src/gatekeeper/proxy/*,src/gatekeeper/detectors/*" --fail-under=90
+      - name: Build sdist + wheel
+        run: uv build

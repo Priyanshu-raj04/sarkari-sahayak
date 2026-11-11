@@ -1,0 +1,57 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  SAHAYAK_PROFILE: ci
+  UV_FROZEN: "1"          # fail if uv.lock is out of date
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      db:
+        image: paradedb/paradedb:latest-pg18
+        env:
+          POSTGRES_USER: sahayak
+          POSTGRES_PASSWORD: sahayak
+          POSTGRES_DB: sahayak
+        ports: ["5432:5432"]
+        options: >-
+          --shm-size=1g
+          --health-cmd "pg_isready -U sahayak -d sahayak"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      TEST_DATABASE_URL: postgresql://sahayak:sahayak@localhost:5432/sahayak
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      - run: uv python install 3.13
+      - run: uv sync --group dev
+      - name: Lint
+        run: uv run ruff check . && uv run ruff format --check .
+      - name: Types
+        run: uv run pyright
+      - name: Tests (unit + integration + e2e, no live LLM) with coverage gates
+        run: |
+          uv run pytest -m "not llm" --cov --cov-report=term --cov-report=xml --cov-fail-under=80
+          # 90% retrieve/agent gate enabled once those packages exist (S2/S3):
+          # uv run coverage report --include="src/sahayak/retrieve/*,src/sahayak/agent/*" --fail-under=90
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-xml
+          path: coverage.xml

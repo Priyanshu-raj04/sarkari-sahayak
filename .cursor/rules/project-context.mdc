@@ -1,0 +1,7 @@
+---
+description: Architecture and domain context for Sarkari Sahayak
+alwaysApply: true
+---
+Read docs/guide/sahayak/00-story-and-architecture.md for the story, component diagram and data model.
+Domain: RBI Master Directions (EN + HI). Users ask in Hindi, English or Hinglish. Answers must be in the
+user's language with [chunk_id] citations; if evidence is insufficient, refuse in both languages.

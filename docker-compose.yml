@@ -1,0 +1,40 @@
+name: sahayak
+
+services:
+  db:
+    # Pin the exact tag from https://hub.docker.com/r/paradedb/paradedb/tags (pg18 line).
+    image: paradedb/paradedb:${PARADEDB_TAG:-latest-pg18}
+    environment:
+      POSTGRES_USER: sahayak
+      POSTGRES_PASSWORD: sahayak
+      POSTGRES_DB: sahayak
+    ports: ["5432:5432"]
+    shm_size: 1g            # parallel queries fail with Docker's 64 MB default /dev/shm
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sahayak -d sahayak"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    deploy:
+      resources:
+        limits: { memory: 768m }
+
+  phoenix:
+    image: arizephoenix/phoenix:${PHOENIX_TAG:-latest}
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      PHOENIX_SQL_DATABASE_URL: postgresql://sahayak:sahayak@db:5432/phoenix
+    ports:
+      - "6006:6006"   # UI + OTLP/HTTP (/v1/traces)
+      - "4317:4317"   # OTLP/gRPC
+    deploy:
+      resources:
+        limits: { memory: 512m }
+    profiles: ["tracing"]
+
+volumes:
+  pgdata:

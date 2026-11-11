@@ -1,0 +1,18 @@
+# Example consumer workflow (also used to dogfood the action on this repo's fixtures)
+name: mcp-security
+on:
+  pull_request:
+    paths: ["mcp-tools/**", "tests/fixtures/tools/**"]
+permissions:
+  contents: read
+  security-events: write   # required to upload SARIF
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./              # in other repos: Priyanshu-raj04/mcp-gatekeeper@v1
+        with:
+          tools: tests/fixtures/tools/sahayak.tools.json
+          lockfile: tests/fixtures/tools/sahayak.lock.json
+          fail-on: high
