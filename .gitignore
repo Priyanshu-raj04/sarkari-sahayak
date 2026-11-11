@@ -218,3 +218,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local data (PDFs, caches, indexes) — manifests stay in data_manifest/
+data/
+*.pdf

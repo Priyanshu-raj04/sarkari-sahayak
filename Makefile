@@ -1,4 +1,4 @@
-.PHONY: help install up down logs fmt lint typecheck test test-int test-e2e cov check clean
+.PHONY: help install up down logs fmt lint typecheck test test-int test-e2e cov check clean ingest
 
 help:  ## Show targets
 	@grep -E "^[a-zA-Z0-9_-]+:.*?## " $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
@@ -38,6 +38,9 @@ cov:  ## Unit tests with coverage gates
 	uv run pytest -m "not integration and not e2e and not llm" --cov --cov-report=term --cov-fail-under=80 -q
 
 check: lint typecheck cov  ## Everything CI runs on every push
+
+ingest:  ## Download + ingest the manifest
+	uv run sahayak ingest
 
 clean:  ## Remove caches
 	rm -rf .pytest_cache .ruff_cache .coverage coverage.xml htmlcov
