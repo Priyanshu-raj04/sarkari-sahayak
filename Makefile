@@ -36,7 +36,7 @@ test-e2e:  ## End-to-end tests (needs make up + server)
 
 cov:  ## Unit tests with coverage gates
 	uv run pytest -m "not integration and not e2e and not llm and not slow" --cov --cov-report=term --cov-fail-under=80 -q
-	uv run coverage report --include="src/sahayak/retrieve/*" --fail-under=90
+	uv run coverage report --include="src/sahayak/retrieve/*,src/sahayak/agent/*" --fail-under=90
 
 check: lint typecheck cov  ## Everything CI runs on every push
 

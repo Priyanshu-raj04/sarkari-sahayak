@@ -1,0 +1,6 @@
+{
+  "model": "ollama_chat/qwen3:4b-instruct",
+  "content": "{\"supported\": false, \"reason\": \"There is no official or widely recognized standard that supports 'ten years' as a timeframe for KYC low-risk updation. KYC (Know Your Customer) policies typically require periodic reviews, but the duration varies by jurisdiction, institution, and risk profile. 'Ten years' is not a standard or commonly accepted period for low-risk KYC updation.\"}",
+  "prompt_tokens": 101,
+  "completion_tokens": 82
+}

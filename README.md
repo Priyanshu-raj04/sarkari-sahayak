@@ -2,14 +2,14 @@
 
 Bilingual (Hindi/English) agentic-RAG MCP server over RBI regulations. Every answer cites retrieved passages — or the system refuses.
 
-🚧 **Under active development** (S2 retrieval + benchmarks).
+🚧 **Under active development** (S3 agent cite-or-refuse).
 
 ## Roadmap
 
 - [x] S0 Bootstrap (repo skeleton, CI, docs)
 - [x] S1 Ingestion
 - [x] S2 Retrieval + benchmarks
-- [ ] S3 Agent (cite-or-refuse)
+- [x] S3 Agent (cite-or-refuse)
 - [ ] S4 MCP server
 - [ ] S5 UI + Flight Recorder
 - [ ] S6 Ship v1.0
@@ -45,5 +45,15 @@ make bench-quick   # IndicQA-hi → docs/results/retrieval.json + .md
 ```
 
 On Apple Silicon, E5 uses MPS when available (`PYTORCH_ENABLE_MPS_FALLBACK=1` if needed).
+
+### Agent live smoke (local Ollama)
+
+```bash
+ollama serve   # if not already running
+ollama pull qwen3:4b-instruct
+uv run pytest -m llm -q   # excluded from default CI / make check
+```
+
+See `docs/results/agent-notes.md` for measured pass rates.
 
 See `docs/guide/` for the full implementation guide and `AGENTS.md` for contributor rules.
