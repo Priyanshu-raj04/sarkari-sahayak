@@ -51,7 +51,7 @@ jobs:
           uv run pytest -m "not llm and not slow" --cov --cov-report=term --cov-report=xml --cov-fail-under=80
           # S2/S3: retrieve + agent ≥90%
           uv run coverage report --include="src/sahayak/retrieve/*,src/sahayak/agent/*" --fail-under=90
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage-xml
