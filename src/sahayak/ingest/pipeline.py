@@ -1,4 +1,8 @@
-"""manifest row → download → extract (OCR if needed) → chunk → embed → store."""
+"""Ingest one manifest row: fetch → extract → chunk → embed → upsert document/chunks.
+
+Depends on `Fetcher`, `Extractor`, `PassageEmbedder`, and `Writer` protocols so unit tests
+inject fakes. Returns `IngestReport` including OCR page count and script-mismatch flag.
+"""
 
 from collections.abc import Callable, Sequence
 from dataclasses import asdict, dataclass

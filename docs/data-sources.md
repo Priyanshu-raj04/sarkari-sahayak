@@ -10,7 +10,10 @@ Checked: **2026-11-11**.
 | RBI Master Directions (HI) | https://www.rbi.org.in/Hindi/scripts/MasterDirections.aspx | Same | 2026-11-11 | Hindi is often **Unicode HTML** (not a PDF). Devanagari text layer is real Unicode on sampled pages. |
 | RBI robots.txt | https://www.rbi.org.in/robots.txt | n/a | 2026-11-11 | Browser GET returned **“Unauthorised Access”** (WAF). Automated `curl` from this machine was blocked (proxy/403). Treat bulk scripted download as **not clearly permitted**; prefer polite downloader only when a fetch is allowed, else **manual** PDF save into `data/raw/`. |
 | RBI Disclaimer / terms | Footer “Disclaimer” on rbi.org.in | Site terms | 2026-11-11 | Disclaimer link present site-wide; content pages are behind CMS paths that change. Conservative rule: **do not re-host**, cite + deep-link to rbi.org.in / rbidocs only. |
-| MIRACL-hi | Hugging Face | Research / dataset card | — | Local only; never re-host (S2+). |
+| MIRACL-hi topics/qrels | https://huggingface.co/datasets/miracl/miracl | Research / dataset card | 2026-11-11 | Local only; never re-host. Paths below. |
+| MIRACL-hi corpus | https://huggingface.co/datasets/miracl/miracl-corpus | Research / dataset card | 2026-11-11 | `docs-*.jsonl.gz` shards; full 506K overnight embed. |
+| IndicQARetrieval hi | https://huggingface.co/datasets/mteb/IndicQARetrieval | CC0-1.0 (dataset card) | 2026-11-11 | Configs `hi-corpus` / `hi-queries` / `hi-qrels`, split `test`. |
+| NoMIRACL | https://huggingface.co/datasets/miracl/nomiracl | Research / dataset card | 2026-11-11 | Verify `relevant` / `non_relevant` split names before live use (S3 refusal). |
 
 ## How RBI publishes EN / HI
 
@@ -49,6 +52,33 @@ non-interactive clients (and sometimes even to a fresh browser tab). `PoliteDown
 detects this and raises `DisallowedError` instead of caching garbage.
 
 **Workaround for local ingest:** open the Master Direction HTML page in a browser, use
-Print → Save as PDF (or solve the captcha and download), then place the file at the
-cache path `data/raw/<sha256(url)[:24]>.pdf` and re-run `sahayak ingest --only …`.
-For CI/unit tests we never hit the live site.
+Print → Save as PDF, then place the file at:
+
+- `data/raw/<sha256(url)[:24]>.pdf` (preferred), or
+- `data/raw/<sha256(url)[:24]>.html` (same basename — used when the manifest URL is `.aspx`)
+
+Then re-run `sahayak ingest --only <doc_id>`. Never commit PDFs. CI/unit tests never hit the live site.
+
+## Benchmark HF paths (S2, local only — never commit under `data/bench/`)
+
+**MIRACL topics/qrels** (`miracl/miracl`):
+
+- `miracl-v1.0-hi/topics/topics.miracl-v1.0-hi-dev.tsv`
+- `miracl-v1.0-hi/qrels/qrels.miracl-v1.0-hi-dev.tsv`
+
+**MIRACL corpus** (`miracl/miracl-corpus`): Hindi `docs-*.jsonl.gz` shards (list with `huggingface-cli` before coding a full download). Practical subset: all judged hi-dev passages + 50K random distractors (`evals.benchmarks.miracl.build_miracl_hi_50k_subset`). Full 506K e5 embed = overnight follow-up.
+
+**IndicQA-hi** (`mteb/IndicQARetrieval`): `load_dataset(..., "hi-corpus"|"hi-queries"|"hi-qrels", split="test")`.
+
+**NoMIRACL** (`miracl/nomiracl`): fixture loader in `evals.benchmarks.nomiracl`; confirm live split names before S3.
+
+### Manual HI smoke set (DoD)
+
+Ingested 2026-11-11 locally (`script_mismatch=False`, 0 OCR). Print→PDF text layers can
+mangle Devanagari glyphs; `detect_script` still reports `hi`. Prefer official PDFs when WAF allows.
+
+| doc_id | Cache basename | pages / chunks | sha256 (prefix) |
+|---|---|---|---|
+| `MD-KYC-CB-2025-HI` | `8f2bda425b107c27df6f240c` | 23 / 223 | `ba4426a973c8…` |
+| `MD-PPI-HI` | `0291c4b0886ff62bffab511a` | 1 / 3 (truncated print) | `e5cedde51a33…` |
+| `MD-FRAUD-CB-HI` | `25a987ce71597f68201905e1` | 8 / 69 | `bf75de89fbf0…` |

@@ -1,4 +1,7 @@
-"""Deterministic 384-d embedder for S1 (real E5 arrives in S2)."""
+"""Deterministic 384-d `PassageEmbedder` for S1 CLI/tests (swap for `E5Embedder` in S2).
+
+Produces L2-normalised float32 vectors so ingest → pgvector works without torch/ml extras.
+"""
 
 from collections.abc import Sequence
 

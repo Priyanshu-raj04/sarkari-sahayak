@@ -1,4 +1,7 @@
-"""The corpus manifest: one row per source document. Committed to git (the PDFs are not)."""
+"""Corpus manifest CSV: one row per source document (URLs + hashes; never raw PDFs).
+
+Public API: `ManifestRow` (Pydantic), `read_manifest` / `write_manifest`, `sha256_file`.
+"""
 
 import csv
 import hashlib

@@ -1,4 +1,8 @@
-"""`sahayak` command-line entry point. Heavy imports stay inside commands (fast `--help`)."""
+"""`sahayak` CLI entry point (`version`, `db migrate`, `ingest`).
+
+Heavy imports stay inside command bodies so `--help` stays fast. `ingest` uses
+`E5Embedder` (`uv sync --extra ml`).
+"""
 
 from pathlib import Path
 from typing import Annotated
@@ -41,8 +45,10 @@ def ingest(
     only: Annotated[str | None, typer.Option(help="ingest a single doc_id")] = None,
 ) -> None:
     """Download, extract, chunk, embed and store every document in the manifest."""
+    import platform  # noqa: PLC0415
+
     from sahayak.config import get_settings  # noqa: PLC0415
-    from sahayak.embed.fake import FakeEmbedder  # noqa: PLC0415
+    from sahayak.embed.e5 import E5Embedder  # noqa: PLC0415
     from sahayak.ingest.download import PoliteDownloader  # noqa: PLC0415
     from sahayak.ingest.manifest import read_manifest  # noqa: PLC0415
     from sahayak.ingest.pdf import extract_pages  # noqa: PLC0415
@@ -50,10 +56,19 @@ def ingest(
     from sahayak.store.repo import PgRepository, connect  # noqa: PLC0415
 
     settings = get_settings()
+    device: str | None = None
+    if platform.system() == "Darwin":
+        try:
+            import torch  # type: ignore[import-not-found]  # noqa: PLC0415
+
+            if torch.backends.mps.is_available():
+                device = "mps"
+        except ImportError:
+            device = None
     pipeline = IngestPipeline(
         fetcher=PoliteDownloader(cache),
         extract=lambda p, hi: extract_pages(p, expect_hindi=hi),
-        embedder=FakeEmbedder(),
+        embedder=E5Embedder.load(settings.embed_model, device=device),
         writer=PgRepository(connect(settings.database_url)),
     )
     for row in read_manifest(manifest):

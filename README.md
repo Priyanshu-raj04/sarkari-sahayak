@@ -2,13 +2,13 @@
 
 Bilingual (Hindi/English) agentic-RAG MCP server over RBI regulations. Every answer cites retrieved passages — or the system refuses.
 
-🚧 **Under active development** (Phase 0 bootstrap complete; feature milestones next).
+🚧 **Under active development** (S2 retrieval + benchmarks).
 
 ## Roadmap
 
 - [x] S0 Bootstrap (repo skeleton, CI, docs)
-- [ ] S1 Ingestion
-- [ ] S2 Retrieval + benchmarks
+- [x] S1 Ingestion
+- [x] S2 Retrieval + benchmarks
 - [ ] S3 Agent (cite-or-refuse)
 - [ ] S4 MCP server
 - [ ] S5 UI + Flight Recorder
@@ -18,9 +18,32 @@ Bilingual (Hindi/English) agentic-RAG MCP server over RBI regulations. Every ans
 ## Quick start
 
 ```bash
+# Day-to-day (lint, unit tests, typecheck without PDF deps)
 uv sync --group dev
+
+# S1 ingest / PDF+OCR (CI installs this for pyright)
+uv sync --group dev --extra ingest
+
+# S2 harness unit tests (ranx) — also what CI uses with ingest
+uv sync --group dev --extra ingest --extra evals
+
+# Local E5 / FlagEmbedding for ingest + bench-quick (not in default CI)
+uv sync --group dev --extra ingest --extra evals --extra ml
+
 make check
 uv run sahayak version
 ```
+
+`make check` and GitHub Actions install **ingest** + **evals** so `pymupdf` and `ranx` resolve. Real embeddings need `--extra ml` locally. See `CONTRIBUTING.md`.
+
+### Benchmarks (local)
+
+```bash
+make up
+uv sync --group dev --extra ingest --extra evals --extra ml
+make bench-quick   # IndicQA-hi → docs/results/retrieval.json + .md
+```
+
+On Apple Silicon, E5 uses MPS when available (`PYTORCH_ENABLE_MPS_FALLBACK=1` if needed).
 
 See `docs/guide/` for the full implementation guide and `AGENTS.md` for contributor rules.

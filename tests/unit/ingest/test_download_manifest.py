@@ -1,3 +1,4 @@
+import hashlib
 from datetime import date
 from pathlib import Path
 
@@ -63,6 +64,16 @@ def test_waf_captcha_html_is_rejected(tmp_path: Path) -> None:
     dl = PoliteDownloader(tmp_path, client=httpx.Client(), min_interval_s=0)
     with pytest.raises(DisallowedError, match="bot protection"):
         dl.fetch("https://rbi.test/md.pdf")
+
+
+def test_manual_pdf_sibling_used_when_url_suffix_is_html(tmp_path: Path) -> None:
+    # Manifest HI URLs are often .aspx → cache key ends in .html; humans drop a .pdf sibling.
+    url = "https://rbi.test/Hindi/MasterDirections.aspx?ID=1"
+    stem = hashlib.sha256(url.encode()).hexdigest()[:24]
+    pdf = tmp_path / f"{stem}.pdf"
+    pdf.write_bytes(b"%PDF-1.7 manual")
+    dl = PoliteDownloader(tmp_path, client=httpx.Client(), min_interval_s=0)
+    assert dl.fetch(url) == pdf
 
 
 def test_manifest_roundtrip_and_hash(tmp_path: Path) -> None:

@@ -1,4 +1,8 @@
-"""Split documents into overlapping, paragraph-aware chunks with stable ids."""
+"""Split page text into overlapping sentence packs with stable citation ids.
+
+Public API: `split_sentences` (Latin .?! and Devanagari danda/double-danda),
+`chunk_page` → list of `Chunk` with ids `<doc_id>#p<page>c<ordinal>`.
+"""
 
 from dataclasses import dataclass
 

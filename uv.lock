@@ -3337,6 +3337,7 @@ dependencies = [
 
 [package.optional-dependencies]
 evals = [
+    { name = "datasets" },
     { name = "deepeval" },
     { name = "huggingface-hub" },
     { name = "pandas" },
@@ -3384,6 +3385,7 @@ dev = [
 requires-dist = [
     { name = "arize-phoenix-otel", marker = "extra == 'tracing'", specifier = ">=0.17" },
     { name = "bm25s", specifier = ">=0.3.16,<0.4" },
+    { name = "datasets", marker = "extra == 'evals'", specifier = ">=3.0" },
     { name = "deepeval", marker = "extra == 'evals'", specifier = "==4.3.3" },
     { name = "fastapi", specifier = ">=0.162,<0.163" },
     { name = "fastmcp", specifier = "==4.1.6" },

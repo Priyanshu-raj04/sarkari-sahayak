@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-11",
+  "n": 100,
+  "device": "mps",
+  "e5": {
+    "model": "intfloat/multilingual-e5-small",
+    "load_s": 19.266,
+    "encode_s": 2.012,
+    "ms_per_passage": 20.122
+  },
+  "bge_m3": {
+    "model": "BAAI/bge-m3",
+    "load_s": 53.835,
+    "encode_s": 10.533,
+    "ms_per_passage": 105.33
+  }
+}

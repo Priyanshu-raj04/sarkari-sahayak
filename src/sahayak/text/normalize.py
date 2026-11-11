@@ -1,4 +1,9 @@
-"""Unicode normalisation, script detection and tokenisation for Hindi/Marathi/English."""
+"""Unicode normalisation, script detection and tokenisation for Hindi/Marathi/English.
+
+Public API: `normalize_text` (NFC + strip zero-width + collapse space), `tokenize`
+(regex `\\p{L}\\p{M}\\p{N}` so Devanagari matras stay attached), `detect_script`
+(hi/en/mixed/unknown by letter share). Never use stdlib `re` \\w for Hindi.
+"""
 
 import unicodedata
 from typing import Literal

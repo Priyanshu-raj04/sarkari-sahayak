@@ -1,4 +1,8 @@
-"""Postgres repository + pgvector / ParadeDB retrievers."""
+"""Postgres document/chunk repository plus dense (pgvector) and ParadeDB BM25 retrievers.
+
+`PgRepository`: upsert documents, atomic `replace_chunks`, `get_many` → `Passage`.
+`PgDenseRetriever` / `ParadeBM25Retriever`: return ranked chunk_id lists for hybrid fusion (S2).
+"""
 
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass

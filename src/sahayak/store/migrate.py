@@ -1,4 +1,9 @@
-"""Tiny forward-only migration runner (ordered *.sql files, tracked in schema_migrations)."""
+"""Forward-only SQL migrations from `sahayak.store.migrations`, tracked in schema_migrations.
+
+`migrate(conn)` applies pending `*.sql` in name order. Filenames containing `bm25` are skipped
+when `pg_search` is unavailable (Neon). Always `commit()` after the pending-list SELECT so
+nested transactions are real commits, not savepoints.
+"""
 
 from importlib.resources import files
 

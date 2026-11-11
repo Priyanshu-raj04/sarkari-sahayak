@@ -40,16 +40,17 @@ jobs:
         with:
           enable-cache: true
       - run: uv python install 3.13
-      - run: uv sync --group dev
+      # ingest: pymupdf stack for pyright/PDF tests; evals: ranx for harness unit tests
+      - run: uv sync --group dev --extra ingest --extra evals
       - name: Lint
         run: uv run ruff check . && uv run ruff format --check .
       - name: Types
         run: uv run pyright
       - name: Tests (unit + integration + e2e, no live LLM) with coverage gates
         run: |
-          uv run pytest -m "not llm" --cov --cov-report=term --cov-report=xml --cov-fail-under=80
-          # 90% retrieve/agent gate enabled once those packages exist (S2/S3):
-          # uv run coverage report --include="src/sahayak/retrieve/*,src/sahayak/agent/*" --fail-under=90
+          uv run pytest -m "not llm and not slow" --cov --cov-report=term --cov-report=xml --cov-fail-under=80
+          # S2: retrieve ≥90%. Agent gate waits for S3.
+          uv run coverage report --include="src/sahayak/retrieve/*" --fail-under=90
       - uses: actions/upload-artifact@v4
         if: always()
         with:

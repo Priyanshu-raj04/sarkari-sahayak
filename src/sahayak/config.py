@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     log_json: bool = False
 
     database_url: str = "postgresql://sahayak:sahayak@localhost:5432/sahayak"
+    # Separate DB for MIRACL/IndicQA benches — never mix with RBI corpus.
+    bench_database_url: str = "postgresql://sahayak:sahayak@localhost:5432/miracl"
 
     ollama_base_url: str = "http://localhost:11434"
     agent_model: str = "ollama_chat/qwen3:4b-instruct"

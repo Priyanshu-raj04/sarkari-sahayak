@@ -1,0 +1,53 @@
+[
+  {
+    "dataset": "indicqa-hi",
+    "split": "test",
+    "n_queries": 1544,
+    "corpus_size": 261,
+    "system": "bm25",
+    "model": "bm25s+regex-tokenize",
+    "metrics": {
+      "ndcg@10": 0.7026,
+      "recall@10": 0.8494,
+      "recall@100": 0.9569,
+      "mrr@10": 0.6558
+    },
+    "date": "2026-11-11",
+    "git_sha": "e28584fe61229e8e42e334604c051adb65817fc6",
+    "seed": 42
+  },
+  {
+    "dataset": "indicqa-hi",
+    "split": "test",
+    "n_queries": 1544,
+    "corpus_size": 261,
+    "system": "dense",
+    "model": "intfloat/multilingual-e5-small",
+    "metrics": {
+      "ndcg@10": 0.6571,
+      "recall@10": 0.8112,
+      "recall@100": 0.9689,
+      "mrr@10": 0.6083
+    },
+    "date": "2026-11-11",
+    "git_sha": "e28584fe61229e8e42e334604c051adb65817fc6",
+    "seed": 42
+  },
+  {
+    "dataset": "indicqa-hi",
+    "split": "test",
+    "n_queries": 1544,
+    "corpus_size": 261,
+    "system": "hybrid",
+    "model": "intfloat/multilingual-e5-small",
+    "metrics": {
+      "ndcg@10": 0.7204,
+      "recall@10": 0.8698,
+      "recall@100": 0.9628,
+      "mrr@10": 0.673
+    },
+    "date": "2026-11-11",
+    "git_sha": "e28584fe61229e8e42e334604c051adb65817fc6",
+    "seed": 42
+  }
+]

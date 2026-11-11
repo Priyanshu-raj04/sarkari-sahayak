@@ -1,4 +1,8 @@
-"""PDF → page texts. Detects legacy (non-Unicode) Devanagari fonts and falls back to OCR."""
+"""PDF → per-page text, with OCR fallback for scans and legacy Devanagari fonts.
+
+Public API: `extract_pages(path, expect_hindi=...)` → list of `PageText` (`text`|`ocr`).
+`needs_ocr` detects empty pages, Kruti-Dev-style fonts, or Hindi docs with Latin-only layers.
+"""
 
 from collections.abc import Callable
 from dataclasses import dataclass

@@ -221,4 +221,5 @@ __marimo__/
 
 # Local data (PDFs, caches, indexes) — manifests stay in data_manifest/
 data/
+download_pdfs/
 *.pdf

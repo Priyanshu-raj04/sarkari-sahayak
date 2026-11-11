@@ -1,4 +1,9 @@
-"""Polite downloader: honours robots.txt, identifies itself, rate-limits, caches by URL."""
+"""Polite HTTP cache for corpus files.
+
+Honours robots.txt, sends a clear User-Agent, rate-limits requests, and caches by URL hash.
+When RBI's WAF returns a captcha HTML page, raises DisallowedError so callers can drop a
+manual Print→PDF into data/raw/ instead of ingesting garbage.
+"""
 
 import hashlib
 import time
@@ -15,10 +20,12 @@ USER_AGENT = "sarkari-sahayak-research/0.1 (+https://github.com/Priyanshu-raj04/
 
 
 class DisallowedError(RuntimeError):
-    """robots.txt forbids this URL."""
+    """robots.txt forbids this URL, or the response was a bot-protection interstitial."""
 
 
 class PoliteDownloader:
+    """Fetch-or-cache one URL under cache_dir/<sha256(url)[:24]>.{pdf|html}."""
+
     def __init__(
         self,
         cache_dir: Path,
@@ -36,9 +43,11 @@ class PoliteDownloader:
         self._last_request: float | None = None
 
     def fetch(self, url: str) -> Path:
+        """Return a local path for url, using cache when present (incl. manual .pdf drops)."""
         target = self.cache_dir / (hashlib.sha256(url.encode()).hexdigest()[:24] + _suffix(url))
-        if target.exists():
-            return target
+        hit = _resolve_cache_hit(target)
+        if hit is not None:
+            return hit
         if not self._allowed(url):
             raise DisallowedError(url)
         self._wait()
@@ -78,6 +87,17 @@ class PoliteDownloader:
 def _suffix(url: str) -> str:
     path = urlsplit(url).path.lower()
     return ".pdf" if path.endswith(".pdf") else ".html"
+
+
+def _resolve_cache_hit(target: Path) -> Path | None:
+    """Prefer an existing cache file; for non-pdf URLs also accept a manual *.pdf sibling."""
+    if target.exists():
+        return target
+    if target.suffix != ".pdf":
+        sibling = target.with_suffix(".pdf")
+        if sibling.exists():
+            return sibling
+    return None
 
 
 def _looks_like_waf_interstitial(content: bytes) -> bool:
