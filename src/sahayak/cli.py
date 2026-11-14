@@ -80,3 +80,23 @@ def ingest(
             f"{row.doc_id}: {report.pages} pages ({report.ocr_pages} OCR), "
             f"{report.chunks} chunks{flag}"
         )
+
+
+@app.command()
+def serve(host: str = "127.0.0.1", port: int = 8000) -> None:
+    """Run the REST + MCP server."""
+    import uvicorn  # noqa: PLC0415
+
+    from sahayak.api.app import build_app  # noqa: PLC0415
+    from sahayak.bootstrap import build_service  # noqa: PLC0415
+    from sahayak.config import Profile, get_settings  # noqa: PLC0415
+    from sahayak.logging import configure_logging  # noqa: PLC0415
+
+    settings = get_settings()
+    configure_logging(settings.log_level, json=settings.log_json)
+    app_ = build_app(
+        build_service(settings),
+        per_minute=settings.rate_limit_per_minute,
+        trust_proxy=settings.profile is Profile.HOSTED,  # Render sets X-Forwarded-For
+    )
+    uvicorn.run(app_, host=host, port=port)

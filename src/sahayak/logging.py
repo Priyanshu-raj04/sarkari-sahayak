@@ -1,12 +1,19 @@
 """Structured logging. JSON in hosted/CI, pretty console locally."""
 
+from __future__ import annotations
+
 import logging
 import sys
+from typing import TextIO
 
 import structlog
 
 
-def configure_logging(level: str = "INFO", *, json: bool = False) -> None:
+def configure_logging(
+    level: str = "INFO", *, json: bool = False, stream: TextIO | None = None
+) -> None:
+    """Configure structlog. Use `stream=sys.stderr` for MCP stdio (stdout is protocol-only)."""
+    out = stream if stream is not None else sys.stdout
     timestamper = structlog.processors.TimeStamper(fmt="iso", utc=True)
     shared: list[structlog.types.Processor] = [
         structlog.contextvars.merge_contextvars,  # request_id, trace_id bound per request
@@ -21,6 +28,6 @@ def configure_logging(level: str = "INFO", *, json: bool = False) -> None:
     structlog.configure(
         processors=[*shared, structlog.processors.format_exc_info, renderer],
         wrapper_class=structlog.make_filtering_bound_logger(logging.getLevelName(level)),
-        logger_factory=structlog.PrintLoggerFactory(file=sys.stdout),
+        logger_factory=structlog.PrintLoggerFactory(file=out),
         cache_logger_on_first_use=False,
     )
