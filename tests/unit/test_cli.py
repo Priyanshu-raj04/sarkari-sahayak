@@ -12,7 +12,7 @@ def test_version_command_prints_package_version() -> None:
 
 def test_help_lists_db_and_ingest() -> None:
     out = CliRunner().invoke(app, ["--help"]).stdout
-    for cmd in ("db", "ingest", "version"):
+    for cmd in ("db", "ingest", "version", "serve"):
         assert cmd in out
 
 

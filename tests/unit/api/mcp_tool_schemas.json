@@ -1,0 +1,60 @@
+{
+  "get_passage": {
+    "additionalProperties": false,
+    "properties": {
+      "chunk_id": {
+        "maxLength": 200,
+        "minLength": 3,
+        "type": "string"
+      }
+    },
+    "required": [
+      "chunk_id"
+    ],
+    "type": "object"
+  },
+  "search_docs": {
+    "additionalProperties": false,
+    "properties": {
+      "k": {
+        "default": 5,
+        "maximum": 20,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "query": {
+        "description": "Hindi or English",
+        "maxLength": 500,
+        "minLength": 2,
+        "type": "string"
+      }
+    },
+    "required": [
+      "query"
+    ],
+    "type": "object"
+  },
+  "verify_claim": {
+    "additionalProperties": false,
+    "properties": {
+      "chunk_ids": {
+        "items": {
+          "type": "string"
+        },
+        "maxItems": 10,
+        "minItems": 1,
+        "type": "array"
+      },
+      "claim": {
+        "maxLength": 1000,
+        "minLength": 5,
+        "type": "string"
+      }
+    },
+    "required": [
+      "claim",
+      "chunk_ids"
+    ],
+    "type": "object"
+  }
+}

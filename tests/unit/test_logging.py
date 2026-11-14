@@ -1,4 +1,5 @@
 import json
+import sys
 
 import pytest
 import structlog
@@ -21,3 +22,11 @@ def test_debug_is_filtered_at_info(capsys: pytest.CaptureFixture[str]) -> None:
     configure_logging("INFO", json=True)
     structlog.get_logger().debug("noisy")
     assert "noisy" not in capsys.readouterr().out
+
+
+def test_configure_logging_can_write_to_stderr(capsys: pytest.CaptureFixture[str]) -> None:
+    configure_logging("INFO", json=True, stream=sys.stderr)
+    structlog.get_logger().info("stdio_safe")
+    captured = capsys.readouterr()
+    assert "stdio_safe" in captured.err
+    assert "stdio_safe" not in captured.out

@@ -223,3 +223,6 @@ __marimo__/
 data/
 download_pdfs/
 *.pdf
+
+# Personal learning notes (not for git; keep next to the code in the IDE)
+docs/learning/
